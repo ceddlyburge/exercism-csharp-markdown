@@ -9,6 +9,7 @@ public class Markdown
     int lineIndex;
     IReadOnlyList<string> lines;
     readonly StringBuilder html;
+    string notNull = "notnull";
 
     public Markdown()
     {
@@ -66,7 +67,8 @@ public class Markdown
         var headerHtml = Wrap(markdown.Substring(count + 1), headerTag);
 
         NextLine();
-        return headerHtml;
+        WriteHtml(headerHtml);
+        return notNull;
     }
 
     bool CurrentLineExists => lineIndex < lines.Count();
@@ -75,18 +77,13 @@ public class Markdown
 
     bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
 
-
-    private string ParseLineItem()
-    {
-        return null;
-    }
-
     private string ParseParagraph()
     {
         string markdown = CurrentLine;
 
         NextLine();
-        return $"<p>{ParseText(markdown)}</p>";
+        WriteHtml($"<p>{ParseText(markdown)}</p>");
+        return notNull;
     }
 
     void ParseLine()
@@ -101,11 +98,6 @@ public class Markdown
 
         if (result == null)
         {
-            result = ParseLineItem();
-        }
-
-        if (result == null)
-        {
             result = ParseParagraph();
         }
 
@@ -115,7 +107,7 @@ public class Markdown
             throw new ArgumentException("Invalid markdown");
         }
 
-        WriteHtml(result);
+        //WriteHtml(result);
         //return result;
     }
 
