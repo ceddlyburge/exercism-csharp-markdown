@@ -54,14 +54,14 @@ public class Markdown
         if (headingLevel == 0)
             throw new Exception("ParseHeader called on a line that is not a header");
 
-        WriteTag("h" + headingLevel, CurrentLine.Substring(headingLevel + 1));
+        WriteTag($"h{headingLevel}", CurrentLine.Substring(headingLevel + 1));
 
         NextLine();
     }
 
     void ParseParagraph()
     {
-        WriteHtml($"<p>{ParseText(CurrentLine)}</p>");
+        WriteTag("p", ParseText(CurrentLine));
 
         NextLine();
     }
