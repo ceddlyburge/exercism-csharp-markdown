@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 // would like to use contracts and use static analysis to check for problems but I think .net core doesn't support it at the moment
 //using System.Diagnostics.Contracts;
 
-internal class MarkdownInputOutputCoordinator
+internal class MarkdownHtmlIoCoordinator
 {
     int lineIndex;
     IReadOnlyList<string> lines;
@@ -22,7 +22,7 @@ internal class MarkdownInputOutputCoordinator
     internal void WriteTag(string tag, string innerText) => WriteHtml($"<{tag}>{innerText}</{tag}>");
     internal string Html => html.ToString();
 
-    internal MarkdownInputOutputCoordinator()
+    internal MarkdownHtmlIoCoordinator()
     {
         html = new StringBuilder();
         lines = new List<string>();
@@ -37,7 +37,7 @@ internal class MarkdownInputOutputCoordinator
 
 internal class MarkdownToHtmlTagBase
 {
-    readonly MarkdownInputOutputCoordinator inputOutputCoordinator;
+    readonly MarkdownHtmlIoCoordinator inputOutputCoordinator;
 
     protected int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
     protected void NextLine() => inputOutputCoordinator.NextLine();
@@ -48,7 +48,7 @@ internal class MarkdownToHtmlTagBase
     protected void WriteHtml(string html) => inputOutputCoordinator.WriteHtml(html);
     protected void WriteTag(string tag, string innerText) => inputOutputCoordinator.WriteTag(tag, innerText);
 
-    public MarkdownToHtmlTagBase(MarkdownInputOutputCoordinator inputOutputCoordinator)
+    public MarkdownToHtmlTagBase(MarkdownHtmlIoCoordinator inputOutputCoordinator)
     {
         // see comment at top of file.Contract.Requires(inputOutputCoordinator != null);
         this.inputOutputCoordinator = inputOutputCoordinator ?? throw new ArgumentNullException(nameof(inputOutputCoordinator));
@@ -70,7 +70,7 @@ internal class MarkdownToHtmlTagBase
 
 internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase
 {
-    internal MarkdownToHtmlHeaderTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
+    internal MarkdownToHtmlHeaderTag(MarkdownHtmlIoCoordinator inputOutputCoordinator)
         : base(inputOutputCoordinator)
     { }
 
@@ -91,7 +91,7 @@ internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase
 
 internal class MarkdownToHtmlParagraphTag : MarkdownToHtmlTagBase
 {
-    internal MarkdownToHtmlParagraphTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
+    internal MarkdownToHtmlParagraphTag(MarkdownHtmlIoCoordinator inputOutputCoordinator)
         : base(inputOutputCoordinator)
     { }
 
@@ -105,7 +105,7 @@ internal class MarkdownToHtmlParagraphTag : MarkdownToHtmlTagBase
 
 internal class MarkdownToHtmlUnorderedListTag : MarkdownToHtmlTagBase
 {
-    internal MarkdownToHtmlUnorderedListTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
+    internal MarkdownToHtmlUnorderedListTag(MarkdownHtmlIoCoordinator inputOutputCoordinator)
         : base(inputOutputCoordinator)
     { }
 
@@ -152,7 +152,7 @@ public class Markdown
     public Markdown()
     {
         // I would probably use dependency injection to set these up in a bigger example
-        inputOutputCoordinator = new MarkdownInputOutputCoordinator();
+        inputOutputCoordinator = new MarkdownHtmlIoCoordinator();
         header = new MarkdownToHtmlHeaderTag(inputOutputCoordinator);
         unorderedList = new MarkdownToHtmlUnorderedListTag(inputOutputCoordinator);
         paragraph = new MarkdownToHtmlParagraphTag(inputOutputCoordinator);
@@ -178,7 +178,7 @@ public class Markdown
     bool CurrentLineExists => inputOutputCoordinator.CurrentLineExists;
     string CurrentLine => inputOutputCoordinator.CurrentLine;
 
-    readonly MarkdownInputOutputCoordinator inputOutputCoordinator;
+    readonly MarkdownHtmlIoCoordinator inputOutputCoordinator;
     readonly MarkdownToHtmlHeaderTag header;
     readonly MarkdownToHtmlUnorderedListTag unorderedList;
     readonly MarkdownToHtmlParagraphTag paragraph;

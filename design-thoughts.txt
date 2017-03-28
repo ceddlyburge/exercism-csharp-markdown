@@ -1,18 +1,8 @@
 Plan
 
- coordinator of input output
-
- markdown overall parser (orchestrator)
+ introduce interface for tags (not paragraph)?
  
- markdown base parser (base for specific classes)
- 
- markdown header parser
- 
- markdown list parser
- 
- markdown paragraph parser (special as this is the default)
-
- use dependency injection
+ use dependency injection?
  
  think about method names
   if returning something then a description of what they returning
@@ -30,15 +20,8 @@ Plan
   less total code
   but less obvious
  
- try and have each parser bit as a separate class
-  one class that has lines and line index and output
-  one class for each parser (header etc)
-  these have a base class
-   base class takes the line / line index / output class
-   and has pass through methods for currentline etc
-  main parser class creates a list of parsers
-
  install sonar qube and see if it says anything
+  could do this on appveyor?
  
  install latest c# thingy and see if it has any recommendations
 
