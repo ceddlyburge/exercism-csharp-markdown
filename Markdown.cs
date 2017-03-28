@@ -89,7 +89,7 @@ public class Markdown
             ParseList();
         else if (CurrentLineIsHeader)
             ParseHeader();
-        else 
+        else
             ParseParagraph();
     }
 
@@ -108,8 +108,9 @@ public class Markdown
         WriteHtml("</ul>");
     }
 
+    void ParseListItem() => WriteHtml($"<li>{ParseText(CurrentLineWithoutMarkdownListIndicator())}</li>");
 
-    void ParseListItem() => WriteHtml($"<li>{ParseText(CurrentLine.Substring(2))}</li>");
+    string CurrentLineWithoutMarkdownListIndicator() => CurrentLine.Substring(2);
 
     public string Parse(string markdown)
     {
