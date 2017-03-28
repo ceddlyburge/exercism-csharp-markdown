@@ -18,29 +18,29 @@ public class Markdown
 
     void WriteHtml(string html) => this.html.Append(html); 
 
-    private static string Wrap(string text, string tag) => "<" + tag + ">" + text + "</" + tag + ">";
+    static string Wrap(string text, string tag) => "<" + tag + ">" + text + "</" + tag + ">";
 
-    private static bool IsTag(string text, string tag) => text.StartsWith("<" + tag + ">");
+    static bool IsTag(string text, string tag) => text.StartsWith("<" + tag + ">");
 
-    private static string Parse(string markdown, string delimiter, string tag)
+    static string Parse(string markdown, string delimiter, string tag)
     {
         var pattern = delimiter + "(.+)" + delimiter;
         var replacement = "<" + tag + ">$1</" + tag + ">";
         return Regex.Replace(markdown, pattern, replacement);
     }
 
-    private static string Parse__(string markdown) => Parse(markdown, "__", "strong");
+    static string Parse__(string markdown) => Parse(markdown, "__", "strong");
 
-    private static string Parse_(string markdown) => Parse(markdown, "_", "em");
+    static string Parse_(string markdown) => Parse(markdown, "_", "em");
 
-    private static string ParseText(string markdown)
+    static string ParseText(string markdown)
     {
         var parsedText = Parse_(Parse__((markdown)));
 
         return parsedText;
     }
 
-    private string ParseHeader()
+    string ParseHeader()
     {
         string markdown = CurrentLine;
 
@@ -77,7 +77,7 @@ public class Markdown
 
     bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
 
-    private string ParseParagraph()
+    string ParseParagraph()
     {
         string markdown = CurrentLine;
 
@@ -106,9 +106,6 @@ public class Markdown
             NextLine();
             throw new ArgumentException("Invalid markdown");
         }
-
-        //WriteHtml(result);
-        //return result;
     }
 
     string ParseList()
@@ -128,7 +125,7 @@ public class Markdown
 
     void NextLine() => lineIndex++;
 
-    private string ListItem()
+    string ListItem()
     {
         return Wrap(ParseText(CurrentLine.Substring(2)), "li");
     }
