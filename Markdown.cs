@@ -96,20 +96,19 @@ public class Markdown
 
     void ParseList()
     {
-        string html = "<ul>";
+        WriteHtml("<ul>");
 
         do
         {
-            html += ListItem();
+            WriteHtml(ListItem());
             NextLine();
         } while (CurrentLineIsList);
 
-        html += "</ul>";
-
-        WriteHtml(html);
+        WriteHtml("</ul>");
     }
 
     void NextLine() => lineIndex++;
+    void FirstLine() => lineIndex = 0;
 
     string ListItem()
     {
@@ -129,13 +128,4 @@ public class Markdown
         return html.ToString();
     }
 
-    private bool NewMethod()
-    {
-        return lineIndex < lines.Count;
-    }
-
-    private void FirstLine()
-    {
-        lineIndex = 0;
-    }
 }
