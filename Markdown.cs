@@ -6,6 +6,13 @@ using System.Text.RegularExpressions;
 // would like to use contracts and use static analysis to check for problems but I think .net core doesn't support it at the moment
 //using System.Diagnostics.Contracts;
 
+internal interface IMarkdownToHtmlTag
+{
+    bool CanParseCurrentLine { get; }
+
+    void WriteHtmlTag();
+}
+
 internal class MarkdownHtmlIoCoordinator
 {
     int lineIndex;
@@ -66,15 +73,15 @@ internal class MarkdownToHtmlTagBase
     static string Markdown_IndicatorsReplacedWithHtmlEmTags(string markdown) => MarkdownIndicatorsReplacedWithHtmlTags(markdown, "_", "em");
 }
 
-internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase
+internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase, IMarkdownToHtmlTag
 {
     internal MarkdownToHtmlHeaderTag(MarkdownHtmlIoCoordinator ioCoordinator)
         : base(ioCoordinator)
     { }
 
-    internal bool CanParseCurrentLine => CurrentLineExists && CurrentLine.StartsWith("#");
+    public bool CanParseCurrentLine => CurrentLineExists && CurrentLine.StartsWith("#");
 
-    internal void WriteHtmlTag()
+    public void WriteHtmlTag()
     {
         if (HeadingLevel == 0)
             throw new Exception("ParseHeader called on a line that is not a header");
@@ -104,15 +111,15 @@ internal class MarkdownToHtmlParagraphTag : MarkdownToHtmlTagBase
     }
 }
 
-internal class MarkdownToHtmlUnorderedListTag : MarkdownToHtmlTagBase
+internal class MarkdownToHtmlUnorderedListTag : MarkdownToHtmlTagBase, IMarkdownToHtmlTag
 {
     internal MarkdownToHtmlUnorderedListTag(MarkdownHtmlIoCoordinator ioCoordinator)
         : base(ioCoordinator)
     { }
 
-    internal bool CanParseCurrentLine => CurrentLineExists && CurrentLine.StartsWith("*");
+    public bool CanParseCurrentLine => CurrentLineExists && CurrentLine.StartsWith("*");
 
-    internal void WriteHtmlTag()
+    public void WriteHtmlTag()
     {
         WriteHtml("<ul>");
 
