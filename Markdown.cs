@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 public class Markdown
 {
     private int lineIndex;
+    private IReadOnlyList<string> lines;
 
     private static string Wrap(string text, string tag) => "<" + tag + ">" + text + "</" + tag + ">";
 
@@ -131,11 +134,11 @@ public class Markdown
 
     public string Parse(string markdown)
     {
-        var lines = markdown.Split('\n');
+        lines = markdown.Split('\n').ToList();
         var result = "";
         var list = false;
 
-        for (int i = 0; i < lines.Length; i++)
+        for (int i = 0; i < lines.Count; i++)
         {
             lineIndex = i;
             var lineResult = ParseLine(lines[lineIndex], list, out list);
