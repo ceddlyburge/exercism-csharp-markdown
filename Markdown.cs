@@ -9,7 +9,6 @@ public class Markdown
     int lineIndex;
     IReadOnlyList<string> lines;
     readonly StringBuilder html;
-    string notNull = "notnull";
 
     public Markdown()
     {
@@ -40,7 +39,7 @@ public class Markdown
         return parsedText;
     }
 
-    string ParseHeader()
+    void ParseHeader()
     {
         string markdown = CurrentLine;
 
@@ -60,15 +59,15 @@ public class Markdown
 
         if (count == 0)
         {
-            return null;
+            throw new Exception("ParseHeader called on a line that is not a header");
         }
 
         var headerTag = "h" + count;
         var headerHtml = Wrap(markdown.Substring(count + 1), headerTag);
 
-        NextLine();
         WriteHtml(headerHtml);
-        return notNull;
+
+        NextLine();
     }
 
     bool CurrentLineExists => lineIndex < lines.Count();
@@ -78,33 +77,24 @@ public class Markdown
     bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
     bool CurrentLineIsHeader => CurrentLineExists && CurrentLine.StartsWith("#");
 
-    string ParseParagraph()
+    void ParseParagraph()
     {
         WriteHtml($"<p>{ParseText(CurrentLine)}</p>");
 
         NextLine();
-
-        return notNull;
     }
 
     void ParseLine()
     {
         if (CurrentLineIsList)
-        {
-            WriteHtml(ParseList());
-            return;
-        }
+            ParseList();
         else if (CurrentLineIsHeader)
-        {
             ParseHeader();
-        }
         else 
-        {
             ParseParagraph();
-        }
     }
 
-    string ParseList()
+    void ParseList()
     {
         string html = "<ul>";
 
@@ -116,7 +106,7 @@ public class Markdown
 
         html += "</ul>";
 
-        return html;
+        WriteHtml(html);
     }
 
     void NextLine() => lineIndex++;
