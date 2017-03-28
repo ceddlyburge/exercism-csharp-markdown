@@ -122,12 +122,17 @@ public class Markdown
 
         html.Clear();
 
-        lineIndex = 0;
+        FirstLine();
         while (lineIndex < lines.Count)
         {
             ParseLine();
         }
 
         return html.ToString();
+    }
+
+    private void FirstLine()
+    {
+        lineIndex = 0;
     }
 }
