@@ -4,35 +4,63 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-public class Markdown
+internal class MarkdownInputOutputCoordinator
 {
     int lineIndex;
     IReadOnlyList<string> lines;
-    int CurrentLineIndex => lineIndex;
-    void NextLine() => lineIndex++;
-    void FirstLine() => lineIndex = 0;
-    bool CurrentLineExists => lineIndex < lines.Count();
-    string CurrentLine => lines[lineIndex];
+
+    internal int CurrentLineIndex => lineIndex;
+    internal void NextLine() => lineIndex++;
+    internal void FirstLine() => lineIndex = 0;
+    internal bool CurrentLineExists => lineIndex < lines.Count();
+    internal string CurrentLine => lines[lineIndex];
 
     readonly StringBuilder html;
-    void WriteHtml(string html) => this.html.Append(html);
-    void WriteTag(string headerTag, string text) => WriteHtml($"<{headerTag}>{text}</{headerTag}>");
+    internal void WriteHtml(string html) => this.html.Append(html);
+    internal void WriteTag(string tag, string innerText) => WriteHtml($"<{tag}>{innerText}</{tag}>");
+    internal string Html => html.ToString();
+
+    internal MarkdownInputOutputCoordinator()
+    {
+        html = new StringBuilder();
+        lines = new List<string>();
+    }
+
+    internal void Start(IReadOnlyList<string> lines)
+    {
+        this.lines = lines;
+        html.Clear();
+    }
+}
+
+public class Markdown
+{
+    readonly MarkdownInputOutputCoordinator inputOutputCoordinator;
+
+    int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
+    void NextLine() => inputOutputCoordinator.NextLine();
+    void FirstLine() => inputOutputCoordinator.FirstLine();
+    bool CurrentLineExists => inputOutputCoordinator.CurrentLineExists;
+    string CurrentLine => inputOutputCoordinator.CurrentLine;
+
+    void WriteHtml(string html) => inputOutputCoordinator.WriteHtml(html);
+    void WriteTag(string tag, string innerText) => inputOutputCoordinator.WriteTag(tag, innerText);
 
     public Markdown()
     {
-        html = new StringBuilder();
+        inputOutputCoordinator = new MarkdownInputOutputCoordinator();
     }
 
-    static string Parse(string markdown, string delimiter, string tag)
+    static string ParseMidlineMarkdown(string markdown, string delimiter, string tag)
     {
         var pattern = delimiter + "(.+)" + delimiter;
         var replacement = "<" + tag + ">$1</" + tag + ">";
         return Regex.Replace(markdown, pattern, replacement);
     }
 
-    static string ParseMidlineStrongMarkdown(string markdown) => Parse(markdown, "__", "strong");
+    static string ParseMidlineStrongMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "__", "strong");
 
-    static string ParseMidlineEmMarkdown(string markdown) => Parse(markdown, "_", "em");
+    static string ParseMidlineEmMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "_", "em");
 
     static string ParseMidlineMarkdown(string markdown) => ParseMidlineEmMarkdown(ParseMidlineStrongMarkdown((markdown)));
 
@@ -89,10 +117,8 @@ public class Markdown
 
     public string Parse(string markdown)
     {
-        lines = markdown.Split('\n').ToList();
-
-        html.Clear();
-
+        inputOutputCoordinator.Start(markdown.Split('\n').ToList());
+ 
         FirstLine();
         while (CurrentLineExists)
         {
@@ -103,7 +129,7 @@ public class Markdown
                 throw new Exception($"Internal parser error. Line '{CurrentLine}' would have caused infinite loop.");
         }
 
-        return html.ToString();
+        return inputOutputCoordinator.Html;
     }
     
 }
