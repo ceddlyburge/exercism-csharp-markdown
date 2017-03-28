@@ -26,7 +26,7 @@ public class MarkdownTest
         Assert.Equal(expected, Markdown.Parse(input));
     }
 
-    [Fact(Skip = "Remove to run test")]
+    [Fact]
     public void Mixed_normal_italics_and_bold_text()
     {
         var input = "This will _be_ __mixed__";
@@ -34,7 +34,7 @@ public class MarkdownTest
         Assert.Equal(expected, Markdown.Parse(input));
     }
 
-    [Fact(Skip = "Remove to run test")]
+    [Fact]
     public void With_h1_header_level()
     {
         var input = "# This will be an h1";
@@ -42,7 +42,7 @@ public class MarkdownTest
         Assert.Equal(expected, Markdown.Parse(input));
     }
 
-    [Fact(Skip = "Remove to run test")]
+    [Fact]
     public void With_h2_header_level()
     {
         var input = "## This will be an h2";
@@ -50,7 +50,7 @@ public class MarkdownTest
         Assert.Equal(expected, Markdown.Parse(input));
     }
 
-    [Fact(Skip = "Remove to run test")]
+    [Fact]
     public void With_h6_header_level()
     {
         var input = "###### This will be an h6";
@@ -58,7 +58,7 @@ public class MarkdownTest
         Assert.Equal(expected, Markdown.Parse(input));
     }
 
-    [Fact(Skip = "Remove to run test")]
+    [Fact]
     public void Unordered_lists()
     {
         var input = "* Item 1\n* Item 2";
@@ -66,7 +66,7 @@ public class MarkdownTest
         Assert.Equal(expected, Markdown.Parse(input));
     }
 
-    [Fact(Skip = "Remove to run test")]
+    [Fact]
     public void With_a_little_bit_of_everything()
     {
         var input = "# Header!\n* __Bold Item__\n* _Italic Item_";
