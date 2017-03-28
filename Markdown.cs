@@ -6,6 +6,13 @@ using System.Text.RegularExpressions;
 // would like to use contracts and use static analysis to check for problems but I think .net core doesn't support it at the moment
 //using System.Diagnostics.Contracts;
 
+public class MarkdownInternalException : Exception
+{
+    public MarkdownInternalException(string message) : base(message)
+    {
+    }
+}
+
 internal interface IMarkdownToHtmlTag
 {
     bool CanParseCurrentLine { get; }
@@ -79,16 +86,10 @@ internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase, IMarkdownToHtmlT
         : base(ioCoordinator)
     { }
 
-    public bool CanParseCurrentLine => CurrentLineExists && CurrentLine.StartsWith("#");
+    public bool CanParseCurrentLine => CurrentLineExists && HeadingLevel > 0 && HeadingLevel <= 6;
 
     public void WriteHtmlTag()
     {
-        if (HeadingLevel == 0)
-            throw new Exception("ParseHeader called on a line that is not a header");
-
-        if (HeadingLevel > 6)
-            throw new Exception($"Invalid Markdown: h6 is the lowest level heading available, but trying to create h{HeadingLevel}");
-
         WriteTag($"h{HeadingLevel}", CurrentLine.Substring(HeadingLevel + 1));
 
         MoveToNextLine();
@@ -166,7 +167,7 @@ public class Markdown
             ParseCurrentLine();
 
             if (currentLineIndex == CurrentLineIndex)
-                throw new Exception($"Internal parser error. Line '{CurrentLine}' would have caused an infinite loop.");
+                throw new MarkdownInternalException($"Internal parser error. Line '{CurrentLine}' would have caused an infinite loop.");
         }
 
         return Html;

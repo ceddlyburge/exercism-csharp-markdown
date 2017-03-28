@@ -1,24 +1,6 @@
 Plan
 
- introduce interface for tags (not paragraph)?
- 
- use dependency injection?
- 
- think about method names
-  if returning something then a description of what they returning
-  if doing something then verb and noun
-  
- think about class names
-  ideas from book
- 
- think about variable names
-  ideas from book
- 
- have a base class
- 
- maybe call nextline in writetag?
-  less total code
-  but less obvious
+ use a different type of exception
  
  install sonar qube and see if it says anything
   could do this on appveyor?
@@ -33,6 +15,7 @@ Done
  add a check to main loop to make sure that lineIndex always increases
  Use test / execute pattern thing
  instance variable for the result
+ introduce interface for tags (not paragraph)?
 
  
 Problems
