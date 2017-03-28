@@ -37,8 +37,10 @@ public class Markdown
         }
     }
 
-    private static string ParseHeader(string markdown, bool list, out bool inListAfter)
+    private string ParseHeader(bool list, out bool inListAfter)
     {
+        string markdown = CurrentLine;
+
         var count = 0;
 
         for (int i = 0; i < markdown.Length; i++)
@@ -74,8 +76,12 @@ public class Markdown
         }
     }
 
-    private static string ParseLineItem(string markdown, bool list, out bool inListAfter)
+    private string CurrentLine => lines[lineIndex];
+
+    private string ParseLineItem(bool list, out bool inListAfter)
     {
+        string markdown = CurrentLine;
+
         if (markdown.StartsWith("*"))
         {
             var innerHtml = Wrap(ParseText(markdown.Substring(2), true), "li");
@@ -96,8 +102,10 @@ public class Markdown
         return null;
     }
 
-    private static string ParseParagraph(string markdown, bool list, out bool inListAfter)
+    private string ParseParagraph(bool list, out bool inListAfter)
     {
+        string markdown = CurrentLine;
+
         if (!list)
         {
             inListAfter = false;
@@ -110,18 +118,18 @@ public class Markdown
         }
     }
 
-    private static string ParseLine(string markdown, bool list, out bool inListAfter)
+    private string ParseLine(bool list, out bool inListAfter)
     {
-        var result = ParseHeader(markdown, list, out inListAfter);
+        var result = ParseHeader(list, out inListAfter);
 
         if (result == null)
         {
-            result = ParseLineItem(markdown, list, out inListAfter);
+            result = ParseLineItem(list, out inListAfter);
         }
 
         if (result == null)
         {
-            result = ParseParagraph(markdown, list, out inListAfter);
+            result = ParseParagraph(list, out inListAfter);
         }
 
         if (result == null)
@@ -141,7 +149,7 @@ public class Markdown
         lineIndex = 0;
         while (lineIndex < lines.Count)
         {
-            var lineResult = ParseLine(lines[lineIndex], list, out list);
+            var lineResult = ParseLine(list, out list);
             result += lineResult;
             lineIndex++;
         }
