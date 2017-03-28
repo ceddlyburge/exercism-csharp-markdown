@@ -70,7 +70,7 @@ internal class MarkdownToHtmlTagBase
 
 internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase
 {
-    public MarkdownToHtmlHeaderTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
+    internal MarkdownToHtmlHeaderTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
         : base(inputOutputCoordinator)
     { }
 
@@ -91,7 +91,7 @@ internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase
 
 internal class MarkdownToHtmlParagraphTag : MarkdownToHtmlTagBase
 {
-    public MarkdownToHtmlParagraphTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
+    internal MarkdownToHtmlParagraphTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
         : base(inputOutputCoordinator)
     { }
 
@@ -105,7 +105,7 @@ internal class MarkdownToHtmlParagraphTag : MarkdownToHtmlTagBase
 
 internal class MarkdownToHtmlUnorderedListTag : MarkdownToHtmlTagBase
 {
-    public MarkdownToHtmlUnorderedListTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
+    internal MarkdownToHtmlUnorderedListTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
         : base(inputOutputCoordinator)
     { }
 
@@ -132,53 +132,6 @@ internal class MarkdownToHtmlUnorderedListTag : MarkdownToHtmlTagBase
 
 public class Markdown
 {
-    readonly MarkdownInputOutputCoordinator inputOutputCoordinator;
-    readonly MarkdownToHtmlHeaderTag header;
-    readonly MarkdownToHtmlUnorderedListTag unorderedList;
-    readonly MarkdownToHtmlParagraphTag paragraph;
-
-    int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
-    //void NextLine() => inputOutputCoordinator.NextLine();
-    void FirstLine() => inputOutputCoordinator.FirstLine();
-    bool CurrentLineExists => inputOutputCoordinator.CurrentLineExists;
-    string CurrentLine => inputOutputCoordinator.CurrentLine;
-
-    //void WriteHtml(string html) => inputOutputCoordinator.WriteHtml(html);
-    //void WriteTag(string tag, string innerText) => inputOutputCoordinator.WriteTag(tag, innerText);
-
-    public Markdown()
-    {
-        // I would probably use dependency injection to set these up in a bigger example
-        inputOutputCoordinator = new MarkdownInputOutputCoordinator();
-        header = new MarkdownToHtmlHeaderTag(inputOutputCoordinator);
-        unorderedList = new MarkdownToHtmlUnorderedListTag(inputOutputCoordinator);
-        paragraph = new MarkdownToHtmlParagraphTag(inputOutputCoordinator);
-    }
-
-    //static string ParseMidlineMarkdown(string markdown, string delimiter, string tag)
-    //{
-    //    var pattern = delimiter + "(.+)" + delimiter;
-    //    var replacement = "<" + tag + ">$1</" + tag + ">";
-    //    return Regex.Replace(markdown, pattern, replacement);
-    //}
-
-    //static string ParseMidlineStrongMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "__", "strong");
-
-    //static string ParseMidlineEmMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "_", "em");
-
-    //static string ParseMidlineMarkdown(string markdown) => ParseMidlineEmMarkdown(ParseMidlineStrongMarkdown((markdown)));
-
-    void ParseCurrentLine()
-    {
-        if (unorderedList.CanParseCurrentLine)
-            unorderedList.WriteHtmlTag();
-        else if (header.CanParseCurrentLine)
-            header.WriteHtmlTag();
-        else
-            paragraph.WriteParagraphTag();
-    }
-
-
     public string Parse(string markdown)
     {
         Start(markdown);
@@ -196,7 +149,37 @@ public class Markdown
         return Html;
     }
 
+    public Markdown()
+    {
+        // I would probably use dependency injection to set these up in a bigger example
+        inputOutputCoordinator = new MarkdownInputOutputCoordinator();
+        header = new MarkdownToHtmlHeaderTag(inputOutputCoordinator);
+        unorderedList = new MarkdownToHtmlUnorderedListTag(inputOutputCoordinator);
+        paragraph = new MarkdownToHtmlParagraphTag(inputOutputCoordinator);
+    }
+
+    void ParseCurrentLine()
+    {
+        if (unorderedList.CanParseCurrentLine)
+            unorderedList.WriteHtmlTag();
+        else if (header.CanParseCurrentLine)
+            header.WriteHtmlTag();
+        else
+            paragraph.WriteParagraphTag();
+    }
+
+
     string Html => inputOutputCoordinator.Html;
 
     void Start(string markdown) => inputOutputCoordinator.Start(markdown.Split('\n').ToList());
+
+    int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
+    void FirstLine() => inputOutputCoordinator.FirstLine();
+    bool CurrentLineExists => inputOutputCoordinator.CurrentLineExists;
+    string CurrentLine => inputOutputCoordinator.CurrentLine;
+
+    readonly MarkdownInputOutputCoordinator inputOutputCoordinator;
+    readonly MarkdownToHtmlHeaderTag header;
+    readonly MarkdownToHtmlUnorderedListTag unorderedList;
+    readonly MarkdownToHtmlParagraphTag paragraph;
 }
