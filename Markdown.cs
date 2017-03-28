@@ -79,10 +79,10 @@ public class Markdown
 
     string ParseParagraph()
     {
-        string markdown = CurrentLine;
+        WriteHtml($"<p>{ParseText(CurrentLine)}</p>");
 
         NextLine();
-        WriteHtml($"<p>{ParseText(markdown)}</p>");
+
         return notNull;
     }
 
@@ -133,6 +133,7 @@ public class Markdown
     public string Parse(string markdown)
     {
         lines = markdown.Split('\n').ToList();
+
         html.Clear();
 
         lineIndex = 0;
