@@ -74,9 +74,9 @@ internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase
         : base(inputOutputCoordinator)
     { }
 
-    internal bool CurrentLineIsHeader => CurrentLineExists && CurrentLine.StartsWith("#");
+    internal bool CanParseCurrentLine => CurrentLineExists && CurrentLine.StartsWith("#");
 
-    internal void ParseHeader()
+    internal void WriteHtmlTag()
     {
         int headingLevel = CurrentLine.TakeWhile(c => c == '#').Count();
 
@@ -89,10 +89,38 @@ internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase
     }
 }
 
+internal class MarkdownToHtmlUnorderedListTag : MarkdownToHtmlTagBase
+{
+    public MarkdownToHtmlUnorderedListTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
+        : base(inputOutputCoordinator)
+    { }
+
+    internal bool CanParseCurrentLine => CurrentLineExists && CurrentLine.StartsWith("*");
+
+    internal void WriteHtmlTag()
+    {
+        WriteHtml("<ul>");
+
+        do
+        {
+            ParseListItem();
+            NextLine();
+        }
+        while (CanParseCurrentLine);
+
+        WriteHtml("</ul>");
+    }
+
+    void ParseListItem() => WriteTag("li", ParseMidlineMarkdown(CurrentLineWithoutMarkdownListIndicator()));
+
+    string CurrentLineWithoutMarkdownListIndicator() => CurrentLine.Substring(2);
+}
+
 public class Markdown
 {
     readonly MarkdownInputOutputCoordinator inputOutputCoordinator;
-    readonly MarkdownToHtmlHeaderTag markdownToHtmlHeaderTag;
+    readonly MarkdownToHtmlHeaderTag header;
+    readonly MarkdownToHtmlUnorderedListTag unorderedList;
 
     int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
     void NextLine() => inputOutputCoordinator.NextLine();
@@ -107,7 +135,8 @@ public class Markdown
     {
         // I would probably use dependency injection to set these up in a bigger example
         inputOutputCoordinator = new MarkdownInputOutputCoordinator();
-        markdownToHtmlHeaderTag = new MarkdownToHtmlHeaderTag(inputOutputCoordinator);
+        header = new MarkdownToHtmlHeaderTag(inputOutputCoordinator);
+        unorderedList = new MarkdownToHtmlUnorderedListTag(inputOutputCoordinator);
     }
 
     static string ParseMidlineMarkdown(string markdown, string delimiter, string tag)
@@ -133,33 +162,14 @@ public class Markdown
 
     void ParseLine()
     {
-        if (CurrentLineIsList)
-            ParseList();
-        else if (markdownToHtmlHeaderTag.CurrentLineIsHeader)
-            markdownToHtmlHeaderTag.ParseHeader();
+        if (unorderedList.CanParseCurrentLine)
+            unorderedList.WriteHtmlTag();
+        else if (header.CanParseCurrentLine)
+            header.WriteHtmlTag();
         else
             ParseParagraph();
     }
 
-    bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
-    
-    void ParseList()
-    {
-        WriteHtml("<ul>");
-
-        do
-        {
-            ParseListItem();
-            NextLine();
-        }
-        while (CurrentLineIsList);
-
-        WriteHtml("</ul>");
-    }
-
-    void ParseListItem() => WriteTag("li", ParseMidlineMarkdown(CurrentLineWithoutMarkdownListIndicator()));
-
-    string CurrentLineWithoutMarkdownListIndicator() => CurrentLine.Substring(2);
 
     public string Parse(string markdown)
     {
