@@ -23,7 +23,7 @@ public class Markdown
 
     private static string Parse_(string markdown) => Parse(markdown, "_", "em");
 
-    private static string ParseText(string markdown, bool list)
+    private static string ParseText(string markdown, bool list = false)
     {
         var parsedText = Parse_(Parse__((markdown)));
 
@@ -37,7 +37,7 @@ public class Markdown
         }
     }
 
-    private string ParseHeader(bool list, out bool inListAfter)
+    private string ParseHeader()
     {
         string markdown = CurrentLine;
 
@@ -57,25 +57,14 @@ public class Markdown
 
         if (count == 0)
         {
-            inListAfter = list;
             return null;
         }
 
         var headerTag = "h" + count;
         var headerHtml = Wrap(markdown.Substring(count + 1), headerTag);
 
-        if (list)
-        {
-            inListAfter = false;
-            NextLine();
-            return "</ul>" + headerHtml;
-        }
-        else
-        {
-            inListAfter = false;
-            NextLine();
-            return headerHtml;
-        }
+        NextLine();
+        return headerHtml;
     }
 
     bool CurrentLineExists => lineIndex < lines.Count();
@@ -85,66 +74,34 @@ public class Markdown
     bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
 
 
-    private string ParseLineItem(bool list, out bool inListAfter)
+    private string ParseLineItem()
     {
-        string markdown = CurrentLine;
-
-        if (markdown.StartsWith("*"))
-        {
-            var innerHtml = Wrap(ParseText(markdown.Substring(2), true), "li");
-
-            if (list)
-            {
-                inListAfter = true;
-                NextLine();
-                return innerHtml;
-            }
-            else
-            {
-                inListAfter = true;
-                NextLine();
-                return "<ul>" + innerHtml;
-            }
-        }
-
-        inListAfter = list;
         return null;
     }
 
-    private string ParseParagraph(bool list, out bool inListAfter)
+    private string ParseParagraph()
     {
         string markdown = CurrentLine;
 
-        if (!list)
-        {
-            inListAfter = false;
-            NextLine();
-            return ParseText(markdown, list);
-        }
-        else
-        {
-            inListAfter = false;
-            NextLine();
-            return "</ul>" + ParseText(markdown, list);
-        }
+        NextLine();
+        return ParseText(markdown);
     }
 
-    private string ParseLine(bool list)
+    private string ParseLine()
     {
         if (CurrentLineIsList)
             return ParseList();
 
-        bool inListAfter;
-        var result = ParseHeader(list, out inListAfter);
+        var result = ParseHeader();
 
         if (result == null)
         {
-            result = ParseLineItem(list, out inListAfter);
+            result = ParseLineItem();
         }
 
         if (result == null)
         {
-            result = ParseParagraph(list, out inListAfter);
+            result = ParseParagraph();
         }
 
         if (result == null)
@@ -182,22 +139,14 @@ public class Markdown
     {
         lines = markdown.Split('\n').ToList();
         var result = "";
-        var list = false;
 
         lineIndex = 0;
         while (lineIndex < lines.Count)
         {
-            var lineResult = ParseLine(list);
+            var lineResult = ParseLine();
             result += lineResult;
         }
 
-        if (list)
-        {
-            return result + "</ul>";
-        }
-        else
-        {
-            return result;
-        }
+        return result;
     }
 }
