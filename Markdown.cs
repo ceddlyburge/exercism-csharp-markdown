@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-// would like to use contracts and use static analysis to check for problems but I think .net core doesn't support it at the moment
-//using System.Diagnostics.Contracts;
+using System.Diagnostics.Contracts;
 
 
 // there are a variety of interfaces and classes in this file, which should all be in their own files, but I don't think exercism supports this.
@@ -64,8 +63,9 @@ internal class MarkdownToHtmlTagBase
 
     public MarkdownToHtmlTagBase(MarkdownHtmlIoCoordinator inputOutputCoordinator)
     {
-        // see comment at top of file: Contract.Requires(inputOutputCoordinator != null);
-        this.ioCoordinator = inputOutputCoordinator ?? throw new ArgumentNullException(nameof(inputOutputCoordinator));
+        Contract.Requires(inputOutputCoordinator != null);
+
+        this.ioCoordinator = inputOutputCoordinator;
     }
 
     protected static string MarkdownMidlineIndicatorsReplacedWithHtmlTags(string markdown) => Markdown_IndicatorsReplacedWithHtmlEmTags(Markdown__IndicatorsReplacedWithHtmlStrongTags((markdown)));
