@@ -1,7 +1,6 @@
 ﻿using Xunit;
-using MarkdownToHtml;
 
-namespace MarkdownToHtmlTests
+namespace MarkdownToHtml
 {
     public class MarkdownTest
     {
