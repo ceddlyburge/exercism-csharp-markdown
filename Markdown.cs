@@ -78,7 +78,12 @@ public class Markdown
         }
     }
 
-    private string CurrentLine => lines[lineIndex];
+    bool CurrentLineExists => lineIndex < lines.Count();
+
+    string CurrentLine => lines[lineIndex];
+
+    bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
+
 
     private string ParseLineItem(bool list, out bool inListAfter)
     {
@@ -124,8 +129,12 @@ public class Markdown
         }
     }
 
-    private string ParseLine(bool list, out bool inListAfter)
+    private string ParseLine(bool list)
     {
+        if (CurrentLineIsList)
+            return ParseList();
+
+        bool inListAfter;
         var result = ParseHeader(list, out inListAfter);
 
         if (result == null)
@@ -147,6 +156,28 @@ public class Markdown
         return result;
     }
 
+    string ParseList()
+    {
+        string html = "<ul>";
+
+        do
+        {
+            html += ListItem();
+            NextLine();
+        } while (CurrentLineIsList);
+
+        html += "</ul>";
+
+        return html;
+    }
+
+    void NextLine() => lineIndex++;
+
+    private string ListItem()
+    {
+        return Wrap(ParseText(CurrentLine.Substring(2), true), "li");
+    }
+
     public string Parse(string markdown)
     {
         lines = markdown.Split('\n').ToList();
@@ -156,7 +187,7 @@ public class Markdown
         lineIndex = 0;
         while (lineIndex < lines.Count)
         {
-            var lineResult = ParseLine(list, out list);
+            var lineResult = ParseLine(list);
             result += lineResult;
         }
 

@@ -6,6 +6,10 @@ Plan
 
  add a check to main loop to make sure that lineIndex always increases
  
+ install sonar qube and see if it says anything
+ 
+ install latest c# thingy and see if it has any recommendations
+ 
 Problems
 
 No instance variables
