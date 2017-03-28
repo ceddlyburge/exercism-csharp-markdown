@@ -8,6 +8,7 @@ public class Markdown
 {
     int lineIndex;
     IReadOnlyList<string> lines;
+    int CurrentLineIndex => lineIndex;
     void NextLine() => lineIndex++;
     void FirstLine() => lineIndex = 0;
     bool CurrentLineExists => lineIndex < lines.Count();
@@ -94,6 +95,7 @@ public class Markdown
     }
 
     bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
+    
     void ParseList()
     {
         WriteHtml("<ul>");
@@ -120,9 +122,16 @@ public class Markdown
 
         FirstLine();
         while (CurrentLineExists)
+        {
+            int currentLine = CurrentLineIndex;
             ParseLine();
+
+            if (currentLine == CurrentLineIndex)
+                throw new Exception($"Internal parser error. Line '{CurrentLine}' would have caused infinite loop.");
+        }
 
         return html.ToString();
     }
 
+    
 }
