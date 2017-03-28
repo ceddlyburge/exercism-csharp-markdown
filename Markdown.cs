@@ -23,8 +23,6 @@ public class Markdown
         html = new StringBuilder();
     }
 
-    static string Wrap(string text, string tag) => "<" + tag + ">" + text + "</" + tag + ">";
-
     static bool IsTag(string text, string tag) => text.StartsWith("<" + tag + ">");
 
     static string Parse(string markdown, string delimiter, string tag)
