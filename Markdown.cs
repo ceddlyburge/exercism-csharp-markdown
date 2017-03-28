@@ -138,11 +138,12 @@ public class Markdown
         var result = "";
         var list = false;
 
-        for (int i = 0; i < lines.Count; i++)
+        lineIndex = 0;
+        while (lineIndex < lines.Count)
         {
-            lineIndex = i;
             var lineResult = ParseLine(lines[lineIndex], list, out list);
             result += lineResult;
+            lineIndex++;
         }
 
         if (list)
