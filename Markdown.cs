@@ -83,7 +83,7 @@ public class Markdown
         WriteHtml("</ul>");
     }
 
-    void ParseListItem() => WriteHtml($"<li>{ParseMidlineMarkdown(CurrentLineWithoutMarkdownListIndicator())}</li>");
+    void ParseListItem() => WriteTag("li", ParseMidlineMarkdown(CurrentLineWithoutMarkdownListIndicator()));
 
     string CurrentLineWithoutMarkdownListIndicator() => CurrentLine.Substring(2);
 
@@ -105,6 +105,5 @@ public class Markdown
 
         return html.ToString();
     }
-
     
 }
