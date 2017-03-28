@@ -89,10 +89,13 @@ public class Markdown
         return $"<p>{ParseText(markdown)}</p>";
     }
 
-    private string ParseLine()
+    void ParseLine()
     {
         if (CurrentLineIsList)
-            return ParseList();
+        {
+            WriteHtml(ParseList());
+            return;
+        }
 
         var result = ParseHeader();
 
@@ -112,7 +115,8 @@ public class Markdown
             throw new ArgumentException("Invalid markdown");
         }
 
-        return result;
+        WriteHtml(result);
+        //return result;
     }
 
     string ParseList()
@@ -140,18 +144,14 @@ public class Markdown
     public string Parse(string markdown)
     {
         lines = markdown.Split('\n').ToList();
-        var result = "";
         html.Clear();
 
         lineIndex = 0;
         while (lineIndex < lines.Count)
         {
-            var lineResult = ParseLine();
-            WriteHtml(lineResult);
-            result += lineResult;
+            ParseLine();
         }
 
-        //return result;
         return html.ToString();
     }
 }
