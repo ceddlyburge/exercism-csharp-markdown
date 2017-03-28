@@ -16,6 +16,7 @@ public class Markdown
 
     readonly StringBuilder html;
     void WriteHtml(string html) => this.html.Append(html);
+    void WriteTag(string headerTag, string text) => WriteHtml($"<{headerTag}>{text}</{headerTag}>");
 
     public Markdown()
     {
@@ -48,31 +49,12 @@ public class Markdown
 
     void ParseHeader()
     {
-        string markdown = CurrentLine;
+        int headingLevel = CurrentLine.TakeWhile(c => c == '#').Count();
 
-        var count = 0;
-
-        for (int i = 0; i < markdown.Length; i++)
-        {
-            if (markdown[i] == '#')
-            {
-                count += 1;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        if (count == 0)
-        {
+        if (headingLevel == 0)
             throw new Exception("ParseHeader called on a line that is not a header");
-        }
 
-        var headerTag = "h" + count;
-        var headerHtml = Wrap(markdown.Substring(count + 1), headerTag);
-
-        WriteHtml(headerHtml);
+        WriteTag("h" + headingLevel, CurrentLine.Substring(headingLevel + 1));
 
         NextLine();
     }
