@@ -39,9 +39,7 @@ internal class MarkdownToHtmlTagBase
 {
     readonly MarkdownHtmlIoCoordinator inputOutputCoordinator;
 
-    protected int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
     protected void NextLine() => inputOutputCoordinator.NextLine();
-    protected void FirstLine() => inputOutputCoordinator.FirstLine();
     protected bool CurrentLineExists => inputOutputCoordinator.CurrentLineExists;
     protected string CurrentLine => inputOutputCoordinator.CurrentLine;
 
@@ -132,7 +130,7 @@ internal class MarkdownToHtmlUnorderedListTag : MarkdownToHtmlTagBase
 
 public class Markdown
 {
-    public string Parse(string markdown)
+    public string ParsedHtml(string markdown)
     {
         Start(markdown);
 
