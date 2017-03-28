@@ -59,18 +59,18 @@ internal class MarkdownToHtmlTagBase
         this.ioCoordinator = inputOutputCoordinator ?? throw new ArgumentNullException(nameof(inputOutputCoordinator));
     }
 
-    protected static string ParseMidlineMarkdown(string markdown) => Markdown_IndicatorsReplacedWithHtmlEmTags(Markdown__IndicatorsReplacedWithHtmlStrongTags((markdown)));
+    protected static string MarkdownMidlineIndicatorsReplacedWithHtmlTags(string markdown) => Markdown_IndicatorsReplacedWithHtmlEmTags(Markdown__IndicatorsReplacedWithHtmlStrongTags((markdown)));
 
-    static string MarkdownIndicatorsReplacedWithHtmlTags(string markdown, string markdownIndicator, string htmlTag)
+    static string Markdown__IndicatorsReplacedWithHtmlStrongTags(string markdown) => SingleMarkdownIndicatorsReplacedWithHtmlTags(markdown, "__", "strong");
+
+    static string Markdown_IndicatorsReplacedWithHtmlEmTags(string markdown) => SingleMarkdownIndicatorsReplacedWithHtmlTags(markdown, "_", "em");
+
+    static string SingleMarkdownIndicatorsReplacedWithHtmlTags(string markdown, string markdownIndicator, string htmlTag)
     {
         var pattern = markdownIndicator + "(.+)" + markdownIndicator;
         var replacement = "<" + htmlTag + ">$1</" + htmlTag + ">";
         return Regex.Replace(markdown, pattern, replacement);
     }
-
-    static string Markdown__IndicatorsReplacedWithHtmlStrongTags(string markdown) => MarkdownIndicatorsReplacedWithHtmlTags(markdown, "__", "strong");
-
-    static string Markdown_IndicatorsReplacedWithHtmlEmTags(string markdown) => MarkdownIndicatorsReplacedWithHtmlTags(markdown, "_", "em");
 }
 
 internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase, IMarkdownToHtmlTag
@@ -105,7 +105,7 @@ internal class MarkdownToHtmlParagraphTag : MarkdownToHtmlTagBase
 
     internal void WriteParagraphTag()
     {
-        WriteTag("p", ParseMidlineMarkdown(CurrentLine));
+        WriteTag("p", MarkdownMidlineIndicatorsReplacedWithHtmlTags(CurrentLine));
 
         MoveToNextLine();
     }
@@ -133,7 +133,7 @@ internal class MarkdownToHtmlUnorderedListTag : MarkdownToHtmlTagBase, IMarkdown
         WriteHtml("</ul>");
     }
 
-    void ParseListItem() => WriteTag("li", ParseMidlineMarkdown(CurrentLineWithoutMarkdownListIndicator));
+    void ParseListItem() => WriteTag("li", MarkdownMidlineIndicatorsReplacedWithHtmlTags(CurrentLineWithoutMarkdownListIndicator));
 
     string CurrentLineWithoutMarkdownListIndicator => CurrentLine.Substring(2);
 }
@@ -144,6 +144,7 @@ public class Markdown
     {
         // Take these via constructor injection later
         ioCoordinator = new MarkdownHtmlIoCoordinator();
+
         markdownToHtmls = new List<IMarkdownToHtmlTag>
         {
             new MarkdownToHtmlHeaderTag(ioCoordinator)
