@@ -100,9 +100,10 @@ public class Markdown
 
         do
         {
-            WriteHtml(ListItem());
+            ParseListItem();
             NextLine();
-        } while (CurrentLineIsList);
+        }
+        while (CurrentLineIsList);
 
         WriteHtml("</ul>");
     }
@@ -110,9 +111,9 @@ public class Markdown
     void NextLine() => lineIndex++;
     void FirstLine() => lineIndex = 0;
 
-    string ListItem()
+    void ParseListItem()
     {
-        return Wrap(ParseText(CurrentLine.Substring(2)), "li");
+        WriteHtml($"<li>{ParseText(CurrentLine.Substring(2))}</li>");
     }
 
     public string Parse(string markdown)
