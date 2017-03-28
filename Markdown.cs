@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+// would like to use contracts and use static analysis to check for problems but I think .net core doesn't support it at the moment
+//using System.Diagnostics.Contracts;
 
 internal class MarkdownInputOutputCoordinator
 {
@@ -33,9 +35,64 @@ internal class MarkdownInputOutputCoordinator
     }
 }
 
+internal class MarkdownToHtmlTagBase
+{
+    readonly MarkdownInputOutputCoordinator inputOutputCoordinator;
+
+    protected int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
+    protected void NextLine() => inputOutputCoordinator.NextLine();
+    protected void FirstLine() => inputOutputCoordinator.FirstLine();
+    protected bool CurrentLineExists => inputOutputCoordinator.CurrentLineExists;
+    protected string CurrentLine => inputOutputCoordinator.CurrentLine;
+
+    protected void WriteHtml(string html) => inputOutputCoordinator.WriteHtml(html);
+    protected void WriteTag(string tag, string innerText) => inputOutputCoordinator.WriteTag(tag, innerText);
+
+    public MarkdownToHtmlTagBase(MarkdownInputOutputCoordinator inputOutputCoordinator)
+    {
+        // see comment at top of file.Contract.Requires(inputOutputCoordinator != null);
+        this.inputOutputCoordinator = inputOutputCoordinator ?? throw new ArgumentNullException(nameof(inputOutputCoordinator));
+    }
+
+    protected static string ParseMidlineMarkdown(string markdown) => ParseMidlineEmMarkdown(ParseMidlineStrongMarkdown((markdown)));
+
+    static string ParseMidlineMarkdown(string markdown, string delimiter, string tag)
+    {
+        var pattern = delimiter + "(.+)" + delimiter;
+        var replacement = "<" + tag + ">$1</" + tag + ">";
+        return Regex.Replace(markdown, pattern, replacement);
+    }
+
+    static string ParseMidlineStrongMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "__", "strong");
+
+    static string ParseMidlineEmMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "_", "em");
+}
+
+internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase
+{
+    public MarkdownToHtmlHeaderTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
+        : base(inputOutputCoordinator)
+    { }
+
+    internal bool CurrentLineIsHeader => CurrentLineExists && CurrentLine.StartsWith("#");
+
+    internal void ParseHeader()
+    {
+        int headingLevel = CurrentLine.TakeWhile(c => c == '#').Count();
+
+        if (headingLevel == 0)
+            throw new Exception("ParseHeader called on a line that is not a header");
+
+        WriteTag($"h{headingLevel}", CurrentLine.Substring(headingLevel + 1));
+
+        NextLine();
+    }
+}
+
 public class Markdown
 {
     readonly MarkdownInputOutputCoordinator inputOutputCoordinator;
+    readonly MarkdownToHtmlHeaderTag markdownToHtmlHeaderTag;
 
     int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
     void NextLine() => inputOutputCoordinator.NextLine();
@@ -48,7 +105,9 @@ public class Markdown
 
     public Markdown()
     {
+        // I would probably use dependency injection to set these up in a bigger example
         inputOutputCoordinator = new MarkdownInputOutputCoordinator();
+        markdownToHtmlHeaderTag = new MarkdownToHtmlHeaderTag(inputOutputCoordinator);
     }
 
     static string ParseMidlineMarkdown(string markdown, string delimiter, string tag)
@@ -64,19 +123,6 @@ public class Markdown
 
     static string ParseMidlineMarkdown(string markdown) => ParseMidlineEmMarkdown(ParseMidlineStrongMarkdown((markdown)));
 
-    bool CurrentLineIsHeader => CurrentLineExists && CurrentLine.StartsWith("#");
-
-    void ParseHeader()
-    {
-        int headingLevel = CurrentLine.TakeWhile(c => c == '#').Count();
-
-        if (headingLevel == 0)
-            throw new Exception("ParseHeader called on a line that is not a header");
-
-        WriteTag($"h{headingLevel}", CurrentLine.Substring(headingLevel + 1));
-
-        NextLine();
-    }
 
     void ParseParagraph()
     {
@@ -89,8 +135,8 @@ public class Markdown
     {
         if (CurrentLineIsList)
             ParseList();
-        else if (CurrentLineIsHeader)
-            ParseHeader();
+        else if (markdownToHtmlHeaderTag.CurrentLineIsHeader)
+            markdownToHtmlHeaderTag.ParseHeader();
         else
             ParseParagraph();
     }

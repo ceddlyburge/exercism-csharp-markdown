@@ -1,5 +1,19 @@
 Plan
 
+ coordinator of input output
+
+ markdown overall parser (orchestrator)
+ 
+ markdown base parser (base for specific classes)
+ 
+ markdown header parser
+ 
+ markdown list parser
+ 
+ markdown paragraph parser (special as this is the default)
+
+ use dependency injection
+ 
  think about method names
   if returning something then a description of what they returning
   if doing something then verb and noun
