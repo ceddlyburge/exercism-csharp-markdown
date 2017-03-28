@@ -8,14 +8,18 @@ public class Markdown
 {
     int lineIndex;
     IReadOnlyList<string> lines;
+    void NextLine() => lineIndex++;
+    void FirstLine() => lineIndex = 0;
+    bool CurrentLineExists => lineIndex < lines.Count();
+    string CurrentLine => lines[lineIndex];
+
     readonly StringBuilder html;
+    void WriteHtml(string html) => this.html.Append(html);
 
     public Markdown()
     {
         html = new StringBuilder();
     }
-
-    void WriteHtml(string html) => this.html.Append(html); 
 
     static string Wrap(string text, string tag) => "<" + tag + ">" + text + "</" + tag + ">";
 
@@ -38,6 +42,8 @@ public class Markdown
 
         return parsedText;
     }
+
+    bool CurrentLineIsHeader => CurrentLineExists && CurrentLine.StartsWith("#");
 
     void ParseHeader()
     {
@@ -70,13 +76,6 @@ public class Markdown
         NextLine();
     }
 
-    bool CurrentLineExists => lineIndex < lines.Count();
-
-    string CurrentLine => lines[lineIndex];
-
-    bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
-    bool CurrentLineIsHeader => CurrentLineExists && CurrentLine.StartsWith("#");
-
     void ParseParagraph()
     {
         WriteHtml($"<p>{ParseText(CurrentLine)}</p>");
@@ -94,6 +93,7 @@ public class Markdown
             ParseParagraph();
     }
 
+    bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
     void ParseList()
     {
         WriteHtml("<ul>");
@@ -108,13 +108,8 @@ public class Markdown
         WriteHtml("</ul>");
     }
 
-    void NextLine() => lineIndex++;
-    void FirstLine() => lineIndex = 0;
 
-    void ParseListItem()
-    {
-        WriteHtml($"<li>{ParseText(CurrentLine.Substring(2))}</li>");
-    }
+    void ParseListItem() => WriteHtml($"<li>{ParseText(CurrentLine.Substring(2))}</li>");
 
     public string Parse(string markdown)
     {
