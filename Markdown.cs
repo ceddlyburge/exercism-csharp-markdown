@@ -138,13 +138,13 @@ public class Markdown
     readonly MarkdownToHtmlParagraphTag paragraph;
 
     int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
-    void NextLine() => inputOutputCoordinator.NextLine();
+    //void NextLine() => inputOutputCoordinator.NextLine();
     void FirstLine() => inputOutputCoordinator.FirstLine();
     bool CurrentLineExists => inputOutputCoordinator.CurrentLineExists;
     string CurrentLine => inputOutputCoordinator.CurrentLine;
 
-    void WriteHtml(string html) => inputOutputCoordinator.WriteHtml(html);
-    void WriteTag(string tag, string innerText) => inputOutputCoordinator.WriteTag(tag, innerText);
+    //void WriteHtml(string html) => inputOutputCoordinator.WriteHtml(html);
+    //void WriteTag(string tag, string innerText) => inputOutputCoordinator.WriteTag(tag, innerText);
 
     public Markdown()
     {
@@ -155,18 +155,18 @@ public class Markdown
         paragraph = new MarkdownToHtmlParagraphTag(inputOutputCoordinator);
     }
 
-    static string ParseMidlineMarkdown(string markdown, string delimiter, string tag)
-    {
-        var pattern = delimiter + "(.+)" + delimiter;
-        var replacement = "<" + tag + ">$1</" + tag + ">";
-        return Regex.Replace(markdown, pattern, replacement);
-    }
+    //static string ParseMidlineMarkdown(string markdown, string delimiter, string tag)
+    //{
+    //    var pattern = delimiter + "(.+)" + delimiter;
+    //    var replacement = "<" + tag + ">$1</" + tag + ">";
+    //    return Regex.Replace(markdown, pattern, replacement);
+    //}
 
-    static string ParseMidlineStrongMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "__", "strong");
+    //static string ParseMidlineStrongMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "__", "strong");
 
-    static string ParseMidlineEmMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "_", "em");
+    //static string ParseMidlineEmMarkdown(string markdown) => ParseMidlineMarkdown(markdown, "_", "em");
 
-    static string ParseMidlineMarkdown(string markdown) => ParseMidlineEmMarkdown(ParseMidlineStrongMarkdown((markdown)));
+    //static string ParseMidlineMarkdown(string markdown) => ParseMidlineEmMarkdown(ParseMidlineStrongMarkdown((markdown)));
 
     void ParseCurrentLine()
     {
