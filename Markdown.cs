@@ -142,10 +142,14 @@ public class Markdown
 {
     public Markdown()
     {
-        // I would probably use dependency injection to set these up in a bigger example
+        // Take these via constructor injection later
         ioCoordinator = new MarkdownHtmlIoCoordinator();
-        header = new MarkdownToHtmlHeaderTag(ioCoordinator);
-        unorderedList = new MarkdownToHtmlUnorderedListTag(ioCoordinator);
+        markdownToHtmls = new List<IMarkdownToHtmlTag>
+        {
+            new MarkdownToHtmlHeaderTag(ioCoordinator)
+            , new MarkdownToHtmlUnorderedListTag(ioCoordinator)
+        };
+
         paragraph = new MarkdownToHtmlParagraphTag(ioCoordinator);
     }
 
@@ -154,6 +158,7 @@ public class Markdown
         Initialise(markdown);
 
         MoveToFirstLine();
+
         while (CurrentLineExists)
         {
             int currentLineIndex = CurrentLineIndex;
@@ -168,26 +173,29 @@ public class Markdown
 
     void ParseCurrentLine()
     {
-        if (unorderedList.CanParseCurrentLine)
-            unorderedList.WriteHtmlTag();
-        else if (header.CanParseCurrentLine)
-            header.WriteHtmlTag();
-        else
+        markdownToHtmls.ToList().ForEach(m => ApplyMarkdownToHtml(m));
+
+        // the paragraph parser is special, in that it applies if nothing else is able to work
+        if (markdownToHtmls.Any(m => m.CanParseCurrentLine) == false && CurrentLineExists)
             paragraph.WriteParagraphTag();
     }
 
-
-    string Html => ioCoordinator.Html;
+    void ApplyMarkdownToHtml(IMarkdownToHtmlTag markdownToHtml)
+    {
+        if (markdownToHtml.CanParseCurrentLine)
+            markdownToHtml.WriteHtmlTag();
+    }
 
     void Initialise(string markdown) => ioCoordinator.Start(markdown.Split('\n').ToList());
 
-    int CurrentLineIndex => ioCoordinator.CurrentLineIndex;
     void MoveToFirstLine() => ioCoordinator.MoveToFirstLine();
+    int CurrentLineIndex => ioCoordinator.CurrentLineIndex;
     bool CurrentLineExists => ioCoordinator.CurrentLineExists;
     string CurrentLine => ioCoordinator.CurrentLine;
 
+    string Html => ioCoordinator.Html;
+
     readonly MarkdownHtmlIoCoordinator ioCoordinator;
-    readonly MarkdownToHtmlHeaderTag header;
-    readonly MarkdownToHtmlUnorderedListTag unorderedList;
+    readonly IReadOnlyList<IMarkdownToHtmlTag> markdownToHtmls;
     readonly MarkdownToHtmlParagraphTag paragraph;
 }
