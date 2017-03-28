@@ -67,11 +67,13 @@ public class Markdown
         if (list)
         {
             inListAfter = false;
+            lineIndex++;
             return "</ul>" + headerHtml;
         }
         else
         {
             inListAfter = false;
+            lineIndex++;
             return headerHtml;
         }
     }
@@ -89,11 +91,13 @@ public class Markdown
             if (list)
             {
                 inListAfter = true;
+                lineIndex++;
                 return innerHtml;
             }
             else
             {
                 inListAfter = true;
+                lineIndex++;
                 return "<ul>" + innerHtml;
             }
         }
@@ -109,11 +113,13 @@ public class Markdown
         if (!list)
         {
             inListAfter = false;
+            lineIndex++;
             return ParseText(markdown, list);
         }
         else
         {
             inListAfter = false;
+            lineIndex++;
             return "</ul>" + ParseText(markdown, list);
         }
     }
@@ -134,6 +140,7 @@ public class Markdown
 
         if (result == null)
         {
+            lineIndex++;
             throw new ArgumentException("Invalid markdown");
         }
 
@@ -151,7 +158,6 @@ public class Markdown
         {
             var lineResult = ParseLine(list, out list);
             result += lineResult;
-            lineIndex++;
         }
 
         if (list)

@@ -4,6 +4,8 @@ Plan
  each parser to parse as many lines as it needs to
  this will require a currentLine variable
 
+ add a check to main loop to make sure that lineIndex always increases
+ 
 Problems
 
 No instance variables
