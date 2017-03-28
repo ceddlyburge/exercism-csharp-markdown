@@ -76,6 +76,7 @@ public class Markdown
     string CurrentLine => lines[lineIndex];
 
     bool CurrentLineIsList => CurrentLineExists && CurrentLine.StartsWith("*");
+    bool CurrentLineIsHeader => CurrentLineExists && CurrentLine.StartsWith("#");
 
     string ParseParagraph()
     {
@@ -93,18 +94,13 @@ public class Markdown
             WriteHtml(ParseList());
             return;
         }
-
-        var result = ParseHeader();
-
-        if (result == null)
+        else if (CurrentLineIsHeader)
         {
-            result = ParseParagraph();
+            ParseHeader();
         }
-
-        if (result == null)
+        else 
         {
-            NextLine();
-            throw new ArgumentException("Invalid markdown");
+            ParseParagraph();
         }
     }
 

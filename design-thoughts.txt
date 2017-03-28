@@ -13,7 +13,8 @@ Plan
 Done
  instance variables for lineIndex and current line
  Each parse now in control of the number of lines it reads
- Old list logic replaces
+ Old list logic replaced
+ instance variable for html output
 
  
 Problems
