@@ -23,18 +23,11 @@ public class Markdown
 
     private static string Parse_(string markdown) => Parse(markdown, "_", "em");
 
-    private static string ParseText(string markdown, bool list = false)
+    private static string ParseText(string markdown)
     {
         var parsedText = Parse_(Parse__((markdown)));
 
-        if (list)
-        {
-            return parsedText;
-        }
-        else
-        {
-            return Wrap(parsedText, "p");
-        }
+        return parsedText;
     }
 
     private string ParseHeader()
@@ -84,7 +77,7 @@ public class Markdown
         string markdown = CurrentLine;
 
         NextLine();
-        return ParseText(markdown);
+        return $"<p>{ParseText(markdown)}</p>";
     }
 
     private string ParseLine()
@@ -132,7 +125,7 @@ public class Markdown
 
     private string ListItem()
     {
-        return Wrap(ParseText(CurrentLine.Substring(2), true), "li");
+        return Wrap(ParseText(CurrentLine.Substring(2)), "li");
     }
 
     public string Parse(string markdown)
