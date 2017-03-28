@@ -23,8 +23,6 @@ public class Markdown
         html = new StringBuilder();
     }
 
-    static bool IsTag(string text, string tag) => text.StartsWith("<" + tag + ">");
-
     static string Parse(string markdown, string delimiter, string tag)
     {
         var pattern = delimiter + "(.+)" + delimiter;
@@ -32,16 +30,11 @@ public class Markdown
         return Regex.Replace(markdown, pattern, replacement);
     }
 
-    static string Parse__(string markdown) => Parse(markdown, "__", "strong");
+    static string ParseMidlineStrongMarkdown(string markdown) => Parse(markdown, "__", "strong");
 
-    static string Parse_(string markdown) => Parse(markdown, "_", "em");
+    static string ParseMidlineEmMarkdown(string markdown) => Parse(markdown, "_", "em");
 
-    static string ParseText(string markdown)
-    {
-        var parsedText = Parse_(Parse__((markdown)));
-
-        return parsedText;
-    }
+    static string ParseMidlineMarkdown(string markdown) => ParseMidlineEmMarkdown(ParseMidlineStrongMarkdown((markdown)));
 
     bool CurrentLineIsHeader => CurrentLineExists && CurrentLine.StartsWith("#");
 
@@ -59,7 +52,7 @@ public class Markdown
 
     void ParseParagraph()
     {
-        WriteTag("p", ParseText(CurrentLine));
+        WriteTag("p", ParseMidlineMarkdown(CurrentLine));
 
         NextLine();
     }
@@ -90,7 +83,7 @@ public class Markdown
         WriteHtml("</ul>");
     }
 
-    void ParseListItem() => WriteHtml($"<li>{ParseText(CurrentLineWithoutMarkdownListIndicator())}</li>");
+    void ParseListItem() => WriteHtml($"<li>{ParseMidlineMarkdown(CurrentLineWithoutMarkdownListIndicator())}</li>");
 
     string CurrentLineWithoutMarkdownListIndicator() => CurrentLine.Substring(2);
 
