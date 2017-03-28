@@ -168,7 +168,7 @@ public class Markdown
 
     static string ParseMidlineMarkdown(string markdown) => ParseMidlineEmMarkdown(ParseMidlineStrongMarkdown((markdown)));
 
-    void ParseLine()
+    void ParseCurrentLine()
     {
         if (unorderedList.CanParseCurrentLine)
             unorderedList.WriteHtmlTag();
@@ -181,19 +181,22 @@ public class Markdown
 
     public string Parse(string markdown)
     {
-        inputOutputCoordinator.Start(markdown.Split('\n').ToList());
+        Start(markdown);
 
         FirstLine();
         while (CurrentLineExists)
         {
             int currentLine = CurrentLineIndex;
-            ParseLine();
+            ParseCurrentLine();
 
             if (currentLine == CurrentLineIndex)
                 throw new Exception($"Internal parser error. Line '{CurrentLine}' would have caused infinite loop.");
         }
 
-        return inputOutputCoordinator.Html;
+        return Html;
     }
 
+    string Html => inputOutputCoordinator.Html;
+
+    void Start(string markdown) => inputOutputCoordinator.Start(markdown.Split('\n').ToList());
 }
