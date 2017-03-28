@@ -1,9 +1,7 @@
 Plan
+ static analysis with code contracts doesn't seem to be out for 2017 yet
+ there are 2 sonar warnings but i am happy with them
 
- install sonar qube and see if it says anything
-  could do this on appveyor?
- 
- install latest c# thingy and see if it has any recommendations
 
 Done
  instance variables for lineIndex and current line
