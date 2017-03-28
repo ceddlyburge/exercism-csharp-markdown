@@ -1,7 +1,5 @@
 Plan
 
- use a different type of exception
- 
  install sonar qube and see if it says anything
   could do this on appveyor?
  
@@ -16,6 +14,8 @@ Done
  Use test / execute pattern thing
  instance variable for the result
  introduce interface for tags (not paragraph)?
+ use a different type of exception
+ names of things 
 
  
 Problems

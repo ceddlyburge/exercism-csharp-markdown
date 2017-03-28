@@ -42,7 +42,7 @@ internal class MarkdownHtmlIoCoordinator
         lines = new List<string>();
     }
 
-    internal void Start(IReadOnlyList<string> lines)
+    internal void Initialise(IReadOnlyList<string> lines)
     {
         this.lines = lines;
         html.Clear();
@@ -188,7 +188,7 @@ public class Markdown
             markdownToHtml.WriteHtmlTag();
     }
 
-    void Initialise(string markdown) => ioCoordinator.Start(markdown.Split('\n').ToList());
+    void Initialise(string markdown) => ioCoordinator.Initialise(markdown.Split('\n').ToList());
 
     void MoveToFirstLine() => ioCoordinator.MoveToFirstLine();
     int CurrentLineIndex => ioCoordinator.CurrentLineIndex;
