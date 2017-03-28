@@ -1,14 +1,20 @@
 Plan
 
+ instance variable for the result
+
  Use test / execute pattern thing
- each parser to parse as many lines as it needs to
- this will require a currentLine variable
 
  add a check to main loop to make sure that lineIndex always increases
  
  install sonar qube and see if it says anything
  
  install latest c# thingy and see if it has any recommendations
+
+Done
+ instance variables for lineIndex and current line
+ Each parse now in control of the number of lines it reads
+ Old list logic replaces
+
  
 Problems
 

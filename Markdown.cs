@@ -1,12 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 public class Markdown
 {
-    private int lineIndex;
-    private IReadOnlyList<string> lines;
+    int lineIndex;
+    IReadOnlyList<string> lines;
+    readonly StringBuilder html;
+
+    public Markdown()
+    {
+        html = new StringBuilder();
+    }
+
+    void WriteHtml(string html) => this.html.Append(html); 
 
     private static string Wrap(string text, string tag) => "<" + tag + ">" + text + "</" + tag + ">";
 
@@ -132,14 +141,17 @@ public class Markdown
     {
         lines = markdown.Split('\n').ToList();
         var result = "";
+        html.Clear();
 
         lineIndex = 0;
         while (lineIndex < lines.Count)
         {
             var lineResult = ParseLine();
+            WriteHtml(lineResult);
             result += lineResult;
         }
 
-        return result;
+        //return result;
+        return html.ToString();
     }
 }
