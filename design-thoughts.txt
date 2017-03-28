@@ -1,0 +1,40 @@
+Plan
+
+ Use test / execute pattern thing
+ each parser to parse as many lines as it needs to
+ this will require a currentLine variable
+
+Problems
+
+No instance variables
+
+public static string Parse(string markdown)
+ list shouldn't be in this method, its also passed in as a var and an out
+ reads one line at a time, this doesn't work for parsing a list
+ 
+private static string ParseLine(string markdown, bool list, out bool inListAfter)
+ using result == null is a bad way of indicating what kind of thing it is
+ and list stuff
+	
+private static string ParseHeader(string markdown, bool list, out bool inListAfter)
+ and list stuff
+ could refactor the bit that works out how many #'s there are for the heading level
+ remove the list stuff
+ 
+private static string ParseParagraph(string markdown, bool list, out bool inListAfter)
+ remove the list stuff
+
+private static string ParseLineItem(string markdown, bool list, out bool inListAfter)
+ this does the list stuff
+ it needs to read everything in the list instead of being called one line at a time
+ 
+private static string ParseText(string markdown, bool list)
+ this gets called for <p>'s and when inside a list, which makes it harder
+ 
+private static string Parse__(string markdown) => Parse(markdown, "__", "strong");
+private static string Parse_(string markdown) => Parse(markdown, "_", "em");
+ called from parse text
+ would be good to make this fluent
+
+private static string Parse(string markdown, string delimiter, string tag)
+ this looks confusing and could be a lot easier

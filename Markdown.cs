@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-public static class Markdown
+public class Markdown
 {
+    private int lineIndex;
+
     private static string Wrap(string text, string tag) => "<" + tag + ">" + text + "</" + tag + ">";
 
     private static bool IsTag(string text, string tag) => text.StartsWith("<" + tag + ">");
@@ -127,7 +129,7 @@ public static class Markdown
         return result;
     }
 
-    public static string Parse(string markdown)
+    public string Parse(string markdown)
     {
         var lines = markdown.Split('\n');
         var result = "";
@@ -135,7 +137,8 @@ public static class Markdown
 
         for (int i = 0; i < lines.Length; i++)
         {
-            var lineResult = ParseLine(lines[i], list, out list);
+            lineIndex = i;
+            var lineResult = ParseLine(lines[lineIndex], list, out list);
             result += lineResult;
         }
 
