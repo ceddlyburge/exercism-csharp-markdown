@@ -89,6 +89,20 @@ internal class MarkdownToHtmlHeaderTag : MarkdownToHtmlTagBase
     }
 }
 
+internal class MarkdownToHtmlParagraphTag : MarkdownToHtmlTagBase
+{
+    public MarkdownToHtmlParagraphTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
+        : base(inputOutputCoordinator)
+    { }
+
+    internal void WriteParagraphTag()
+    {
+        WriteTag("p", ParseMidlineMarkdown(CurrentLine));
+
+        NextLine();
+    }
+}
+
 internal class MarkdownToHtmlUnorderedListTag : MarkdownToHtmlTagBase
 {
     public MarkdownToHtmlUnorderedListTag(MarkdownInputOutputCoordinator inputOutputCoordinator)
@@ -121,6 +135,7 @@ public class Markdown
     readonly MarkdownInputOutputCoordinator inputOutputCoordinator;
     readonly MarkdownToHtmlHeaderTag header;
     readonly MarkdownToHtmlUnorderedListTag unorderedList;
+    readonly MarkdownToHtmlParagraphTag paragraph;
 
     int CurrentLineIndex => inputOutputCoordinator.CurrentLineIndex;
     void NextLine() => inputOutputCoordinator.NextLine();
@@ -137,6 +152,7 @@ public class Markdown
         inputOutputCoordinator = new MarkdownInputOutputCoordinator();
         header = new MarkdownToHtmlHeaderTag(inputOutputCoordinator);
         unorderedList = new MarkdownToHtmlUnorderedListTag(inputOutputCoordinator);
+        paragraph = new MarkdownToHtmlParagraphTag(inputOutputCoordinator);
     }
 
     static string ParseMidlineMarkdown(string markdown, string delimiter, string tag)
@@ -152,14 +168,6 @@ public class Markdown
 
     static string ParseMidlineMarkdown(string markdown) => ParseMidlineEmMarkdown(ParseMidlineStrongMarkdown((markdown)));
 
-
-    void ParseParagraph()
-    {
-        WriteTag("p", ParseMidlineMarkdown(CurrentLine));
-
-        NextLine();
-    }
-
     void ParseLine()
     {
         if (unorderedList.CanParseCurrentLine)
@@ -167,14 +175,14 @@ public class Markdown
         else if (header.CanParseCurrentLine)
             header.WriteHtmlTag();
         else
-            ParseParagraph();
+            paragraph.WriteParagraphTag();
     }
 
 
     public string Parse(string markdown)
     {
         inputOutputCoordinator.Start(markdown.Split('\n').ToList());
- 
+
         FirstLine();
         while (CurrentLineExists)
         {
@@ -187,5 +195,5 @@ public class Markdown
 
         return inputOutputCoordinator.Html;
     }
-    
+
 }
