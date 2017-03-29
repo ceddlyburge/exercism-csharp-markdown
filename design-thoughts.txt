@@ -1,6 +1,8 @@
 Plan
  static analysis with code contracts doesn't seem to be out for 2017 yet
  there are 2 sonar warnings but i am happy with them
+ 
+ exercism submit IMarkdownToHtmlTag.cs Markdown.cs 	MarkdownHtmlIoCoordinator.cs MarkdownInternalException.cs MarkdownToHtmlHeaderTag.cs MarkdownToHtmlParagraphTag.cs MarkdownToHtmlTagBase.cs MarkdownToHtmlUnorderedListTag.cs
 
 
 Done
