@@ -1,30 +1,22 @@
-# Markdown
+# Exercism C# Markdown problem
+ 
+[Submission on Exercism](http://exercism.io/submissions/6ead0d9fc8954358bb21113768093662)
 
-Refactor a Markdown parser
+## Aims of my refactoring
 
-The markdown exercise is a refactoring exercise. There is code that parses a
-given string with [Markdown
-syntax](https://guides.github.com/features/mastering-markdown/) and returns the
-associated HTML for that string. Even though this code is confusingly written
-and hard to follow, somehow it works and all the tests are passing! Your
-challenge is to re-write this code to make it easier to read and maintain
-while still making sure that all the tests keep passing.
+My primary goal was to optimise for human understandability.
 
-It would be helpful if you made notes of what you did in your refactoring in
-comments so reviewers can see that, but it isn't strictly necessary. The most
-important thing is to make the code better!
+The techniques I used to achieve this are:
+* Stick to single responsibility principle as much as possible, especially in the case of the unordered list code being spread everywhere
+* Keep total variable live and span time as low as possible
+* Encapsulate and obey the law of demeter
+* Name methods that return values to describe the value they return
+* Name methods that return nothing to describe what they do in Verb-Noun format
+* Name variables to describe what they are
+* Name classes to desribe the single responsibility
+* Program defensively
+* Use specific exceptions
 
-### Submitting Exercises
+## Thoughts
 
-Note that, when trying to submit an exercise, make sure you're exercise file you're submitting is in the `exercism/csharp/<exerciseName>` directory.
-
-For example, if you're submitting `bob.cs` for the Bob exercise, the submit command would be something like `exercism submit <path_to_exercism_dir>/csharp/bob/bob.cs`.
-## Hints
-For this exercise the following C# feature comes in handy:
-- [String Interpolation](https://msdn.microsoft.com/en-us/library/dn961160.aspx) (C# 6 and up).
-
-
-
-## Submitting Incomplete Problems
-It's possible to submit an incomplete solution so you can see how others have completed the exercise.
-
+Creating the extendable architecture with IMarkdownToHtmlTag just for the UnorderdedList and Header elements is overkill in this situation, but would get increasingly more relevant as the number of elements increases, which I think it would do in a fully featured markdown parser.
