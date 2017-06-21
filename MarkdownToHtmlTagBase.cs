@@ -28,8 +28,8 @@ namespace MarkdownToHtml
         // this name isn't the most amazing, but couldn't think of anything better
         static string SingleMarkdownIndicatorsReplacedWithHtmlTags(string markdown, string markdownIndicator, string htmlTag)
         {
-            var pattern = markdownIndicator + "(.+)" + markdownIndicator;
-            var replacement = "<" + htmlTag + ">$1</" + htmlTag + ">";
+            var pattern = $"{markdownIndicator}(.+){markdownIndicator}";
+            var replacement = $"<{htmlTag}>$1</{htmlTag}>";
             return Regex.Replace(markdown, pattern, replacement);
         }
 

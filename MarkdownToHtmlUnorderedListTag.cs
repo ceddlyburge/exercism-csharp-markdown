@@ -11,15 +11,19 @@
         public void WriteHtmlTag()
         {
             WriteHtml("<ul>");
+            WriteListItems();
 
+            WriteHtml("</ul>");
+        }
+
+        private void WriteListItems()
+        {
             do
             {
                 ParseListItem();
                 MoveToNextLine();
             }
             while (CanParseCurrentLine);
-
-            WriteHtml("</ul>");
         }
 
         void ParseListItem() => WriteTag("li", MarkdownMidlineIndicatorsReplacedWithHtmlTags(CurrentLineWithoutMarkdownListIndicator));

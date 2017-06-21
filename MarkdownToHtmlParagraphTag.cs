@@ -1,5 +1,8 @@
 ﻿namespace MarkdownToHtml
 {
+    /// <summary>
+    /// 
+    /// </summary>
     internal class MarkdownToHtmlParagraphTag : MarkdownToHtmlTagBase
     {
         internal MarkdownToHtmlParagraphTag(MarkdownHtmlIoCoordinator ioCoordinator)

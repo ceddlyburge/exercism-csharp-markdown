@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MarkdownToHtml
@@ -16,6 +17,8 @@ namespace MarkdownToHtml
                 , new MarkdownToHtmlUnorderedListTag(ioCoordinator)
             };
 
+            infiniteRecursionChecker = new InfiniteRecursionChecker();
+
             paragraph = new MarkdownToHtmlParagraphTag(ioCoordinator);
         }
 
@@ -25,22 +28,28 @@ namespace MarkdownToHtml
 
             while (CurrentLineExists)
             {
-                int currentLineIndex = CurrentLineIndex;
-
+                SaveCurrentLineIndex();
                 ParseAtCurrentLine();
-
-                if (currentLineIndex == CurrentLineIndex)
-                    throw new MarkdownInternalException($"Internal parser error. Line '{CurrentLine}' would have caused an infinite loop.");
+                CheckCurrentLineIndexForInfiniteRecursion();
             }
 
             return Html;
         }
 
+        void CheckCurrentLineIndexForInfiniteRecursion() => infiniteRecursionChecker.CheckCurrentLineIndexForInfiniteRecursion(CurrentLineIndex, CurrentLine);
+
+        void SaveCurrentLineIndex() => infiniteRecursionChecker.SaveCurrentLineIndex(CurrentLineIndex);
+
         void Initialise(string markdown)
         {
-            ioCoordinator.Initialise(markdown.Split('\n').ToList());
+            InitialiseIOCoordinator(markdown);
 
             MoveToFirstLine();
+        }
+
+        void InitialiseIOCoordinator(string markdown)
+        {
+            ioCoordinator.Initialise(markdown.Split('\n').ToList());
         }
 
         void ParseAtCurrentLine()
@@ -69,5 +78,20 @@ namespace MarkdownToHtml
         readonly MarkdownHtmlIoCoordinator ioCoordinator;
         readonly IReadOnlyList<IMarkdownToHtmlTag> markdownToHtmls;
         readonly MarkdownToHtmlParagraphTag paragraph;
+        private InfiniteRecursionChecker infiniteRecursionChecker;
     }
+
+    public class InfiniteRecursionChecker
+    {
+        private int currentLineIndex;
+
+        public void CheckCurrentLineIndexForInfiniteRecursion(int currentLineIndex, string currentLine)
+        {
+            if (this.currentLineIndex == currentLineIndex)
+                throw new MarkdownInternalException($"Internal parser error. Line '{currentLine}' would have caused an infinite loop.");
+        }
+
+        public void SaveCurrentLineIndex(int currentLineIndex) => this.currentLineIndex = currentLineIndex;
+    }
+
 }
