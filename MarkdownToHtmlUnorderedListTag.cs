@@ -6,11 +6,13 @@
             : base(ioCoordinator)
         { }
 
-        public bool CanParseCurrentLine => CurrentLineExists && CurrentLine.StartsWith("*");
+        public bool CanParseCurrentLine => 
+            CurrentLineExists && CurrentLine.StartsWith("*");
 
         public void WriteHtmlTag()
         {
             WriteHtml("<ul>");
+
             WriteListItems();
 
             WriteHtml("</ul>");
@@ -21,13 +23,19 @@
             do
             {
                 ParseListItem();
+
                 MoveToNextLine();
             }
-            while (CanParseCurrentLine);
+            while (CurrentLineIsMarkdownUnorderedList);
         }
 
-        void ParseListItem() => WriteTag("li", MarkdownMidlineIndicatorsReplacedWithHtmlTags(CurrentLineWithoutMarkdownListIndicator));
+        void ParseListItem() => 
+            WriteTag("li", MarkdownMidlineIndicatorsReplacedWithHtmlTags(CurrentLineWithoutMarkdownListIndicator));
 
-        string CurrentLineWithoutMarkdownListIndicator => CurrentLine.Substring(2);
+        string CurrentLineWithoutMarkdownListIndicator =>
+            CurrentLine.Substring(2);
+
+        bool CurrentLineIsMarkdownUnorderedList =>
+            CanParseCurrentLine;
     }
 }

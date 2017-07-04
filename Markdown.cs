@@ -6,6 +6,11 @@ namespace MarkdownToHtml
 {
     public class Markdown
     {
+        readonly MarkdownHtmlIoCoordinator ioCoordinator;
+        readonly IReadOnlyList<IMarkdownToHtmlTag> markdownToHtmls;
+        readonly MarkdownToHtmlParagraphTag paragraph;
+        readonly InfiniteRecursionChecker infiniteRecursionChecker;
+
         public Markdown()
         {
             // Take these via constructor injection later
@@ -26,19 +31,10 @@ namespace MarkdownToHtml
         {
             Initialise(markdown);
 
-            while (CurrentLineExists)
-            {
-                SaveCurrentLineIndex();
-                ParseAtCurrentLine();
-                CheckCurrentLineIndexForInfiniteRecursion();
-            }
+            Parse();
 
             return Html;
         }
-
-        void CheckCurrentLineIndexForInfiniteRecursion() => infiniteRecursionChecker.CheckCurrentLineIndexForInfiniteRecursion(CurrentLineIndex, CurrentLine);
-
-        void SaveCurrentLineIndex() => infiniteRecursionChecker.SaveCurrentLineIndex(CurrentLineIndex);
 
         void Initialise(string markdown)
         {
@@ -47,12 +43,28 @@ namespace MarkdownToHtml
             MoveToFirstLine();
         }
 
-        void InitialiseIOCoordinator(string markdown)
+        void Parse()
         {
-            ioCoordinator.Initialise(markdown.Split('\n').ToList());
+            while (CurrentLineExists)
+                ParseAtCurrentLine();
         }
 
         void ParseAtCurrentLine()
+        {
+            SaveCurrentLineIndex();
+
+            ApplyParsersAtCurrentLine();
+
+            CheckCurrentLineIndexForInfiniteRecursion();
+        }
+
+        bool CurrentLineExists => 
+            ioCoordinator.CurrentLineExists;
+
+        void SaveCurrentLineIndex() =>
+            infiniteRecursionChecker.SaveCurrentLineIndex(CurrentLineIndex);
+
+        void ApplyParsersAtCurrentLine()
         {
             // the paragraph parser is special, in that it applies if nothing else is able to work
             if (CurrentLineExists && markdownToHtmls.Any(m => m.CanParseCurrentLine) == false)
@@ -62,36 +74,30 @@ namespace MarkdownToHtml
             markdownToHtmls.ToList().ForEach(m => ApplyMarkdownToHtml(m));
         }
 
+        void CheckCurrentLineIndexForInfiniteRecursion() =>
+            infiniteRecursionChecker.CheckCurrentLineIndexForInfiniteRecursion(CurrentLineIndex, CurrentLine);
+
+        void InitialiseIOCoordinator(string markdown)
+        {
+            ioCoordinator.Initialise(markdown.Split('\n').ToList());
+        }
+
+        void MoveToFirstLine() => 
+            ioCoordinator.MoveToFirstLine();
+
         void ApplyMarkdownToHtml(IMarkdownToHtmlTag markdownToHtml)
         {
             if (markdownToHtml.CanParseCurrentLine)
                 markdownToHtml.WriteHtmlTag();
         }
 
-        void MoveToFirstLine() => ioCoordinator.MoveToFirstLine();
-        int CurrentLineIndex => ioCoordinator.CurrentLineIndex;
-        bool CurrentLineExists => ioCoordinator.CurrentLineExists;
-        string CurrentLine => ioCoordinator.CurrentLine;
+        int CurrentLineIndex => 
+            ioCoordinator.CurrentLineIndex;
 
-        string Html => ioCoordinator.Html;
+        string CurrentLine => 
+            ioCoordinator.CurrentLine;
 
-        readonly MarkdownHtmlIoCoordinator ioCoordinator;
-        readonly IReadOnlyList<IMarkdownToHtmlTag> markdownToHtmls;
-        readonly MarkdownToHtmlParagraphTag paragraph;
-        private InfiniteRecursionChecker infiniteRecursionChecker;
+        string Html => 
+            ioCoordinator.Html;
     }
-
-    public class InfiniteRecursionChecker
-    {
-        private int currentLineIndex;
-
-        public void CheckCurrentLineIndexForInfiniteRecursion(int currentLineIndex, string currentLine)
-        {
-            if (this.currentLineIndex == currentLineIndex)
-                throw new MarkdownInternalException($"Internal parser error. Line '{currentLine}' would have caused an infinite loop.");
-        }
-
-        public void SaveCurrentLineIndex(int currentLineIndex) => this.currentLineIndex = currentLineIndex;
-    }
-
 }

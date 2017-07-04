@@ -8,7 +8,8 @@ namespace MarkdownToHtml
             : base(ioCoordinator)
         { }
 
-        public bool CanParseCurrentLine => CurrentLineExists && HeadingLevel > 0 && HeadingLevel <= 6;
+        public bool CanParseCurrentLine => 
+            CurrentLineExists && HeadingLevel > 0 && HeadingLevel <= 6;
 
         public void WriteHtmlTag()
         {
@@ -17,6 +18,7 @@ namespace MarkdownToHtml
             MoveToNextLine();
         }
 
-        int HeadingLevel => CurrentLine.TakeWhile(c => c == '#').Count();
+        int HeadingLevel => 
+            CurrentLine.TakeWhile(c => c == '#').Count();
     }
 }

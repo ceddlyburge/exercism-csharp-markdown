@@ -5,6 +5,10 @@ namespace MarkdownToHtml
 {
     internal class MarkdownHtmlIoCoordinator
     {
+        int lineIndex;
+        IReadOnlyList<string> lines;
+        readonly StringBuilder html;
+
         internal MarkdownHtmlIoCoordinator()
         {
             html = new StringBuilder();
@@ -17,18 +21,31 @@ namespace MarkdownToHtml
             html.Clear();
         }
 
-        internal int CurrentLineIndex => lineIndex;
-        internal void MoveToNextLine() => lineIndex++;
-        internal void MoveToFirstLine() => lineIndex = 0;
-        internal bool CurrentLineExists => lineIndex < lines.Count;
-        internal string CurrentLine => lines[lineIndex];
+        internal int CurrentLineIndex => 
+            lineIndex;
 
-        internal void WriteHtml(string html) => this.html.Append(html);
-        internal void WriteTag(string tag, string innerText) => WriteHtml($"<{tag}>{innerText}</{tag}>");
-        internal string Html => html.ToString();
+        internal void MoveToNextLine() => 
+            lineIndex++;
 
-        int lineIndex;
-        IReadOnlyList<string> lines;
-        readonly StringBuilder html;
+        internal void MoveToFirstLine() => 
+            lineIndex = 0;
+
+        internal bool CurrentLineExists => 
+            lineIndex < lines.Count;
+
+        internal string CurrentLine 
+            => CurrentLineExists 
+            ? lines[lineIndex] 
+            : "";
+
+        internal void WriteHtml(string html) => 
+            this.html.Append(html);
+
+        internal void WriteTag(string tag, string innerText) => 
+            WriteHtml($"<{tag}>{innerText}</{tag}>");
+
+        internal string Html => 
+            html.ToString();
+
     }
 }
